@@ -17,6 +17,12 @@ def init_db(database_url: str | None = None) -> None:
     """Create engine and all tables. Call once at application startup."""
     global _engine, _SessionLocal
     url = database_url or os.getenv("DATABASE_URL", "sqlite:///subnexa.db")
+    # Render Postgres connection strings use postgres://; SQLAlchemy 2 expects
+    # an explicit supported driver. psycopg 3 is installed for hosted Postgres.
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+psycopg://", 1)
+    elif url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+psycopg://", 1)
     # SQLite requires connect_args for thread safety in Flask
     connect_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
     _engine = create_engine(url, connect_args=connect_args, echo=False)

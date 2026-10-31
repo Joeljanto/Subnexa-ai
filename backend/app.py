@@ -33,9 +33,8 @@ def create_app() -> Flask:
         "MAIL_DEFAULT_SENDER", "noreply@subnexa.ai"
     )
 
-    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-    allowed_origins = list(set([
-        frontend_url,
+    frontend_urls = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    allowed_origins = {
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:5000",
@@ -44,10 +43,16 @@ def create_app() -> Flask:
         "http://127.0.0.1:4173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-    ]))
+    }
+    for frontend_url in frontend_urls.split(","):
+        frontend_url = frontend_url.strip().rstrip("/")
+        if frontend_url and "://" not in frontend_url:
+            frontend_url = f"https://{frontend_url}"
+        if frontend_url:
+            allowed_origins.add(frontend_url)
     CORS(
         app,
-        resources={r"/*": {"origins": allowed_origins}},
+        resources={r"/*": {"origins": sorted(allowed_origins)}},
         supports_credentials=True,
     )
 

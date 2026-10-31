@@ -5,6 +5,7 @@ Seed initial demo data for SubNexa AI:
 - Subscriptions and Payments
 - Invoices
 """
+import os
 import uuid
 from datetime import datetime, timezone, timedelta
 from backend.database import init_db, get_session
@@ -17,6 +18,8 @@ from backend.billing.models import Invoice, InvoiceStatus
 
 
 def seed_data():
+    admin_password = os.getenv("SEED_ADMIN_PASSWORD", "Admin@1234")
+    staff_password = os.getenv("SEED_STAFF_PASSWORD", "Staff@1234")
     init_db()
     db = get_session()
     try:
@@ -25,7 +28,7 @@ def seed_data():
         if not admin:
             admin = User(
                 email="admin@subnexa.ai",
-                password_hash=hash_password("Admin@1234"),
+                password_hash=hash_password(admin_password),
                 role=UserRole.admin,
                 first_name="Alex",
                 last_name="Vance",
@@ -33,14 +36,14 @@ def seed_data():
                 is_verified=True,
             )
             db.add(admin)
-            print("Created default admin: admin@subnexa.ai / Admin@1234")
+            print("Created seeded admin account: admin@subnexa.ai")
 
         # Check if staff already exists
         staff = db.query(User).filter_by(email="staff@subnexa.ai").first()
         if not staff:
             staff = User(
                 email="staff@subnexa.ai",
-                password_hash=hash_password("Staff@1234"),
+                password_hash=hash_password(staff_password),
                 role=UserRole.staff,
                 first_name="Sarah",
                 last_name="Connor",
@@ -48,7 +51,7 @@ def seed_data():
                 is_verified=True,
             )
             db.add(staff)
-            print("Created default staff: staff@subnexa.ai / Staff@1234")
+            print("Created seeded staff account: staff@subnexa.ai")
 
         # Check if customers exist
         if db.query(Customer).count() == 0:

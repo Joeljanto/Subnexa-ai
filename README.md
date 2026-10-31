@@ -222,6 +222,21 @@ cd frontend && npm run build
 # Output: ✓ built in ~800ms with 0 compilation errors
 ```
 
+---
+
+## 🌐 Deploy as a public website (Render)
+
+The repository includes a `render.yaml` Blueprint for the Vite frontend, Flask API, and PostgreSQL database. To create the services:
+
+1. Push the project to GitHub and sign in to [Render](https://render.com/).
+2. Choose **New → Blueprint**, connect this repository, and select the `main` branch.
+3. When prompted, enter strong, unique values for `SEED_ADMIN_PASSWORD` and `SEED_STAFF_PASSWORD`. These become the seeded admin and staff login passwords; do not use the local demo passwords for a public deployment.
+4. Apply the Blueprint and wait for both `subnexa-api` and `subnexa-web` to finish deploying. Open the `subnexa-web` URL shown in Render.
+
+The Blueprint creates a demo PostgreSQL database and seeds sample dashboard data. The free API can take about a minute to wake after inactivity, and Render's free PostgreSQL database expires after 30 days. Use a paid database plan for a persistent public demo. This application uses seeded sample billing data and is not connected to Stripe or a live subscription provider.
+
+For Google sign-in, add `GOOGLE_CLIENT_ID` to the API service and `VITE_GOOGLE_CLIENT_ID` to the frontend service, then add the deployed frontend domain to the OAuth client's authorized JavaScript origins in Google Cloud Console. Email/password login works without Google OAuth.
+
 
 ---
 
