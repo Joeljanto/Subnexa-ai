@@ -224,18 +224,19 @@ cd frontend && npm run build
 
 ---
 
-## 🌐 Deploy as a public website (Render)
+## 🌐 Deploy the full app to Vercel
 
-The repository includes a `render.yaml` Blueprint for the Vite frontend, Flask API, and PostgreSQL database. To create the services:
+The root `vercel.json` configures the Vite frontend and Flask API as Vercel Services on one domain. The frontend serves the dashboard while `/auth/*`, `/api/*`, and `/health` route to Flask. Vercel currently lists Services as a Beta feature.
 
-1. Push the project to GitHub and sign in to [Render](https://render.com/).
-2. Choose **New → Blueprint**, connect this repository, and select the `main` branch.
-3. When prompted, enter strong, unique values for `SEED_ADMIN_PASSWORD` and `SEED_STAFF_PASSWORD`. These become the seeded admin and staff login passwords; do not use the local demo passwords for a public deployment.
-4. Apply the Blueprint and wait for both `subnexa-api` and `subnexa-web` to finish deploying. Open the `subnexa-web` URL shown in Render.
+1. Push this repository to GitHub, sign in to [Vercel](https://vercel.com/), and import `Joeljanto/Subnexa-ai` as a project.
+2. Vercel reads the Services configuration from `vercel.json` and builds the frontend and backend separately. If the project setup asks for a framework, choose the Services configuration rather than setting one project-wide framework.
+3. Connect a PostgreSQL provider from the Vercel Marketplace (for example, Neon) and set `DATABASE_URL` to its pooled connection string.
+4. Set these project environment variables for Production and Preview: `SECRET_KEY`, `JWT_SECRET`, `SEED_ADMIN_PASSWORD`, and `SEED_STAFF_PASSWORD`. Use strong unique values. The first two protect sessions/tokens; the last two set the seeded demo accounts' passwords.
+5. Deploy and open the Vercel URL. The backend initializes the schema and seeds sample demo records on startup. Sign in with `admin@subnexa.ai` or `staff@subnexa.ai` and the password you assigned to the corresponding seed environment variable.
 
-The Blueprint creates a demo PostgreSQL database and seeds sample dashboard data. The free API can take about a minute to wake after inactivity, and Render's free PostgreSQL database expires after 30 days. Use a paid database plan for a persistent public demo. This application uses seeded sample billing data and is not connected to Stripe or a live subscription provider.
+Google sign-in is optional. To enable it, set `GOOGLE_CLIENT_ID` for the API and `VITE_GOOGLE_CLIENT_ID` for the frontend, then add the Vercel domain to the OAuth client's authorized JavaScript origins in Google Cloud Console.
 
-For Google sign-in, add `GOOGLE_CLIENT_ID` to the API service and `VITE_GOOGLE_CLIENT_ID` to the frontend service, then add the deployed frontend domain to the OAuth client's authorized JavaScript origins in Google Cloud Console. Email/password login works without Google OAuth.
+This remains a hackathon demo with seeded billing data; it does not connect to Stripe or another live subscription provider. Use a persistent PostgreSQL database for deployments because Vercel function filesystems are not a database.
 
 
 ---
